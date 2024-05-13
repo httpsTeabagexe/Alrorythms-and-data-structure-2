@@ -3,6 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <windows.h>
+#include <list>
+#include <algorithm>
 using namespace std;
 
 // Структура для хранения информации об авиакомпании
@@ -26,6 +29,7 @@ Airline* createAirline(string name);
 
 // Функция для добавления аэропорта в конец списка
 void addAirport(Airport*& head, string codeIATA);
+//void addAirline(Airport* airport, string name);
 
 // Функция для добавления авиакомпании к аэропорту
 void addAirline(Airport* airport, string name);
@@ -48,5 +52,27 @@ void saveAirportsToFile(Airport* head, string filename);
 // Функция для поиска аэропорта по коду IATA
 Airport* findAirportByCode(Airport* head, string codeIATA);
 
+string getValidIATACode();
+
+string getValidAirlineName();
+
 // Функция для вывода меню и получения выбора пользователя
 int menuSelection();
+
+char getYesNoAnswer();
+
+string getFilename();
+
+bool check_file_exists(string filename);
+
+bool hasWindowsSpecChar(string filename);
+
+bool isReservedName(string name);
+
+bool txt_check(string filename);
+
+void add_txt(string& filename);
+
+void setColor(int colorCode);
+
+void resetColor();

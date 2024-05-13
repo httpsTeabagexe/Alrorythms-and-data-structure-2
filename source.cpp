@@ -48,50 +48,13 @@ void addAirline(Airport* airport, string name) {
 }
 
 // Function to delete an airport by IATA code
-
-//void deleteAirport(Airport*& head, string codeIATA) {
-//    if (head == nullptr) return;
-//
-//    if (head->codeIATA == codeIATA) {
-//        Airport* temp = head;
-//        head = head->next;
-//        // Delete all airlines associated with this airport
-//        Airline* currentAirline = temp->airlines;
-//        while (currentAirline != nullptr) {
-//            Airline* tempAirline = currentAirline;
-//            currentAirline = currentAirline->next;
-//            delete tempAirline;
-//        }
-//        delete temp;
-//        return;
-//    }
-//
-//    Airport* prev = nullptr;
-//    Airport* current = head;
-//    while (current != nullptr && current->codeIATA != codeIATA) {
-//        prev = current;
-//        current = current->next;
-//    }
-//
-//    if (current != nullptr) {
-//        prev->next = current->next;
-//        // Delete all airlines associated with this airport
-//        Airline* currentAirline = current->airlines;
-//        while (currentAirline != nullptr) {
-//            Airline* tempAirline = currentAirline;
-//            currentAirline = currentAirline->next;
-//            delete tempAirline;
-//        }
-//        delete current;
-//    }
-//}
-
-void deleteAirport(Airport*& head, std::string codeIATA) {
+void deleteAirport(Airport*& head, string codeIATA) {
     if (head == nullptr) return;
 
+    // Case 1: Deleting the head node
     if (head->codeIATA == codeIATA) {
         Airport* temp = head;
-        head = head->next;
+        head = head->next; // Update head to the next node
 
         // Delete all airlines associated with this airport
         Airline* currentAirline = temp->airlines;
@@ -100,22 +63,30 @@ void deleteAirport(Airport*& head, std::string codeIATA) {
             currentAirline = currentAirline->next;
             delete tempAirline;
         }
-        delete temp;
+        delete temp; // Delete the airport
         return;
     }
 
-    Airport* current = head;
-    Airport* prev = nullptr;  // Initialize prev here
+    // Case 2: Deleting a node other than the head
+    Airport* current = head->next; // Start from the node after head
+    Airport* prev = head;         // Keep track of the previous node
 
     while (current != nullptr && current->codeIATA != codeIATA) {
-        prev = current;        // Update prev after moving to the next node
+        prev = current;
         current = current->next;
     }
 
-    if (current != nullptr) {
-        if (prev != nullptr) {  // Check if prev is valid
-            prev->next = current->next;
+    if (current != nullptr) { // Found the airport to delete
+		// Check if the airport has any airlines associated with it
+        if (current->airlines != nullptr) {
+            cout << "Airport '" << codeIATA << "' has airlines associated with it.\n" << "Are you sure you want to delete it? (y/n): ";
+            if (getYesNoAnswer() != 'y') {
+                return; // User chose not to delete
+            }
         }
+
+        // Proceed with deletion
+        prev->next = current->next; // Bypass the current node
 
         // Delete all airlines associated with this airport
         Airline* currentAirline = current->airlines;
@@ -128,30 +99,7 @@ void deleteAirport(Airport*& head, std::string codeIATA) {
     }
 }
 
-//// Function to delete an airline from an airport
-//void deleteAirline(Airport* airport, string name) {
-//    if (airport->airlines == nullptr) return;
-//
-//    if (airport->airlines->name == name) {
-//        Airline* temp = airport->airlines;
-//        airport->airlines = airport->airlines->next;
-//        delete temp;
-//        return;
-//    }
-//
-//    Airline* prev = nullptr;
-//    Airline* current = airport->airlines;
-//    while (current != nullptr && current->name != name) {
-//        prev = current;
-//        current = current->next;
-//    }
-//
-//    if (current != nullptr) {
-//        prev->next = current->next;
-//        delete current;
-//    }
-//}
-
+// Function to delete an airline from an airport
 void deleteAirline(Airport* airport, string name) {
     if (airport->airlines == nullptr) return;
 
@@ -181,8 +129,10 @@ void deleteAirline(Airport* airport, string name) {
 // Function to print the list of airports and airlines
 void printAirports(Airport* head) {
     if (head == nullptr) {
-        cout << "The list of airports is empty." << endl;
-        return;
+        setColor(12);
+        cerr << "ERROR: The list of airports is empty.\n";
+        resetColor();
+        return; // Nothing to print
     }
 
     cout << "List of airports:" << endl;
@@ -203,8 +153,12 @@ void printAirports(Airport* head) {
 
 // Function to load data from a file
 bool loadAirportsFromFile(Airport*& head, string filename) {
+    add_txt(filename); // Add .txt extension if needed
     ifstream inFile(filename);
     if (!inFile.is_open()) {
+        setColor(12);
+        cerr << "ERROR: Unable to open the file '" << filename << "' for reading." << endl;
+        resetColor();
         return false;
     }
 
@@ -217,24 +171,32 @@ bool loadAirportsFromFile(Airport*& head, string filename) {
 
             Airport* airport = findAirportByCode(head, codeIATA);
             if (airport == nullptr) {
-                airport = createAirport(codeIATA);
-                addAirport(head, codeIATA);
+                airport = createAirport(codeIATA); // Create a new airport
+                addAirport(head, codeIATA);       // Add it to the list
             }
-            addAirline(airport, airlineName);
+            addAirline(airport, airlineName); // Add the airline to the airport
         }
         else {
-            cerr << "ERROR: Invalid data format in line: " << line << endl;
+            setColor(12);
+            cerr << "Error: Invalid data format in line: " << line << endl;
+            resetColor();
         }
     }
     inFile.close();
+    setColor(2);
+    cout << "Data successfully loaded from file '" << filename << "'" << endl;
+    resetColor();
     return true;
 }
 
 // Function to save data to a file
 void saveAirportsToFile(Airport* head, string filename) {
+    add_txt(filename); // Add .txt extension if needed
     ofstream outFile(filename);
     if (!outFile.is_open()) {
-        cerr << "ERROR: Unable to open the file for writing." << endl;
+        setColor(12);
+        cerr << "ERROR: Unable to open the file '" << filename << "' for writing." << endl;
+        resetColor();
         return;
     }
 
@@ -248,7 +210,9 @@ void saveAirportsToFile(Airport* head, string filename) {
         currentAirport = currentAirport->next;
     }
     outFile.close();
-    cout << "List of airports successfully saved to file " << filename << endl;
+    setColor(2);
+    cout << "List of airports successfully saved to file '" << filename << "'" << endl;
+    resetColor();
 }
 
 // Function to find an airport by IATA code
@@ -281,91 +245,187 @@ int menuSelection() {
             return choice;
         }
         else {
+			setColor(12);
             cerr << "\nInvalid choice. Please enter a number between 0 and 7.\n";
+			resetColor();
         }
     }
 }
 
-int main() {
-    Airport* head = nullptr;
-    string filename = "airports.txt";
+string getValidAirlineName() {
+    string airlineName;
 
     while (true) {
-        int choice = menuSelection();
+        cout << "Enter the airline name (or '~' to return to menu): ";
+        getline(cin, airlineName);
 
-        switch (choice) {
-        case 1: {
-            string codeIATA;
-            cout << "Enter the airport's IATA code: ";
-            cin >> codeIATA;
-            addAirport(head, codeIATA);
-            break;
+        if (airlineName == "~") {
+            return "~"; // Signal to return to the main menu
         }
-        case 2: {
-            string codeIATA, airlineName;
-            cout << "Enter the airport's IATA code: ";
-            cin >> codeIATA;
-            Airport* airport = findAirportByCode(head, codeIATA);
-            if (airport != nullptr) {
-                cout << "Enter the airline name: ";
-                cin >> airlineName;
-                addAirline(airport, airlineName);
-            }
-            else {
-                cerr << "Airport with this IATA code not found.\n";
-            }
-            break;
+
+        // Airline name validation (letters, numbers, spaces, and hyphens)
+        if (all_of(airlineName.begin(), airlineName.end(), [](char c) {
+            return (c >= '\u0410' && c <= '\u044F') || // Cyrillic uppercase
+                (c >= '\u0430' && c <= '\u045F') || // Cyrillic lowercase
+                isalnum(c) || c == ' ' || c == '-'; // Allow alphanumeric, spaces, hyphens
+            })) {
+            return airlineName;
         }
-        case 3: {
-            string codeIATA;
-            cout << "Enter the airport's IATA code to delete: ";
-            cin >> codeIATA;
-            deleteAirport(head, codeIATA);
-            break;
-        }
-        case 4: {
-            string codeIATA, airlineName;
-            cout << "Enter the airport's IATA code: ";
-            cin >> codeIATA;
-            Airport* airport = findAirportByCode(head, codeIATA);
-            if (airport != nullptr) {
-                cout << "Enter the airline name to delete: ";
-                cin >> airlineName;
-                deleteAirline(airport, airlineName);
-            }
-            else {
-                cout << "Airport with this IATA code not found.\n";
-            }
-            break;
-        }
-        case 5:
-            printAirports(head);
-            break;
-        case 6:
-            if (loadAirportsFromFile(head, filename)) {
-                cout << "Data successfully loaded from file " << filename << endl;
-            }
-            else {
-                cerr << "ERROR: Unable to open the file for reading." << endl;
-            }
-            break;
-        case 7:
-            saveAirportsToFile(head, filename);
-            break;
-        case 0:
-            // Memory release before exiting
-            while (head != nullptr) {
-                Airport* tempAirport = head;
-                head = head->next;
-                Airline* currentAirline = tempAirport->airlines;
-                while (currentAirline != nullptr) {
-                    Airline* tempAirline = currentAirline;
-                    currentAirline = currentAirline->next;
-                    delete tempAirline;
-                }
-                delete tempAirport;
-            }
-            return 0;
+        else {
+            setColor(12);
+            cerr << "ERROR: Invalid airline name. Only letters (including Cyrillic), numbers, spaces, and hyphens (-) are allowed.\n";
+            resetColor();
         }
     }
+}
+
+string getValidIATACode() {
+    string codeIATA;
+
+    while (true) {
+        cout << "Enter the airport's IATA code (or '~' to return to menu):\n" << ">>";
+        getline(cin, codeIATA); // Read the entire line to handle spaces
+
+        if (codeIATA == "~") {
+            return "~"; // Signal to return to the main menu
+        }
+
+        // Remove spaces from the input IATA code
+        codeIATA.erase(remove(codeIATA.begin(), codeIATA.end(), ' '), codeIATA.end());
+
+        // IATA code validation (3 uppercase letters)
+        if (codeIATA.length() == 3 &&
+            all_of(codeIATA.begin(), codeIATA.end(), ::isupper)) {
+            return codeIATA; // Valid IATA code
+        }
+        else {
+            setColor(12);
+            cerr << "ERROR: Invalid IATA code. It must be 3 uppercase letters.\n";
+            resetColor();
+        }
+    }
+}
+
+char getYesNoAnswer() {
+    char choice;
+    while (true) {
+        choice = _getch();
+        cout << choice << endl; // Echo the input
+        choice = tolower(choice);
+
+        if (choice == 'y' || choice == 'n') {
+            return choice;  // Valid answer, return it
+        }
+        else {
+            setColor(12);
+            cerr << "Invalid choice. Please enter 'y' or 'n': ";
+            resetColor();
+        }
+    }
+}
+
+// Function to get a filename from the user
+string getFilename() {
+    string filename;
+    cout << "Enter name of the file (or '~' to return to menu)\n";
+    while (true) {
+        cout << ">>";
+        getline(cin, filename);
+        if (filename == "~") {
+            return "~";
+        }
+        if (filename.empty()) {
+            setColor(12);
+            cerr << "ERROR: File name cannot be empty.\n";
+            resetColor();
+            continue;
+        }
+        if (hasWindowsSpecChar(filename)) {
+            continue;
+        }
+        if (isReservedName(filename)) {
+            continue;
+        }
+        break;
+    }
+    return filename;
+}
+
+// Function to check if the file exists
+bool check_file_exists(string filename) {
+    ifstream file(filename);
+    bool exists = file.good();
+    file.close();
+    return exists;
+}
+
+// Function to check for prohibited characters in the filename
+bool hasWindowsSpecChar(string filename) {
+    // List of characters not allowed in Windows filenames
+    list<char> prohibited_chars = { '<', '>', ':', '\"', '/', '\\', '|', '?', '*' };
+    for (char c : filename) {
+        if (find(prohibited_chars.begin(), prohibited_chars.end(), c) != prohibited_chars.end()) {
+            setColor(12);
+            cerr << "ERROR: Name of the file contains prohibited characters.\n";
+            resetColor();
+            return true;
+        }
+    }
+    return false;
+}
+
+// Function to check if the filename is a reserved name
+bool isReservedName(string name) {
+    // Check if the name matches any of the reserved names
+    static const string reserved_names[] = { "CON","PRN","AUX","NUL",
+    "COM1","COM2","COM3","COM4","COM5","COM6","COM7","COM8","COM9","LPT1","LPT2","LPT3","LPT4","LPT5","LPT6","LPT7","LPT8","LPT9" };
+    for (const auto& reserved : reserved_names) {
+        if (name == reserved) {
+            setColor(12);
+            cerr << "ERROR: It is a reserved name.\n";
+            resetColor();
+            return true; // Name matches a reserved name
+        }
+    }
+    return false; // Name is not reserved
+}
+
+bool txt_check(string filename) {
+    // Check if the filename ends with ".cty" (case insensitive)
+    if (filename.length() >= 4 && equal(filename.end() - 4, filename.end(), ".txt", [](char a, char b) {
+        return tolower(a) == b;
+        })) {
+        setColor(2); cout << "File extension is valid." << endl; resetColor();
+        system("pause"); system("cls");
+        return true;
+    }
+    else { return false; }
+}
+
+void add_txt(string& filename) {
+    if (!txt_check(filename)) {
+        char choice;
+        while (true) {
+            cout << "The filename doesn't have .txt extension. Do you want to add it? (y/n): ";
+            choice = _getch();
+            cout << choice << endl;
+            choice = tolower(choice);
+            if (choice == 'y') {
+                filename += ".txt"; // Add .txt extension to the filename
+                return; // Return after modifying the filename
+            }
+            if (choice == 'n') {
+                cout << "\nFile wasn't modified." << endl;
+                return; // Return without modifying the filename
+            }
+        }
+    }
+}
+
+void setColor(int colorCode) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, colorCode);
+}
+void resetColor() {
+    setColor(7); // 7 is the default color (white on black)
 }

@@ -2,3 +2,18 @@ TRANSAERO	DME
 ISTALINE	DME
 SAMARA	KUF
 KARAT	VKO
+Aeroflot	SVO
+S7 Airlines	DME
+Ural Airlines	SVX
+Pobeda	VKO
+Azur Air	VKO
+Nordwind Airlines	SVO
+Royal Flight	VVO
+Red Wings Airlines	DME
+UTair	VKO
+Yamal Airlines	DME
+IrAero	IRK
+RusLine	KZN
+UVT Aero	UFA
+Alrosa	IKT
+Angara Airlines	IKT
