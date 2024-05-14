@@ -339,6 +339,15 @@ bool loadAirportsFromFile(Airport*& head, string filename) {
 // Function to save data to a file
 void saveAirportsToFile(Airport* head, string filename) {
 	add_txt(filename); // Add .txt extension if needed
+
+	// Check if the list is empty
+	if (head == nullptr) {
+		setColor(12);
+		cerr << "ERROR: The list of airports is empty. Nothing to save.\n";
+		resetColor();
+		return;
+	}
+
 	ofstream outFile(filename);
 	if (!outFile.is_open()) {
 		setColor(12);
