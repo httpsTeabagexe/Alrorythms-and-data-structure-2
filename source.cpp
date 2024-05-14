@@ -1,47 +1,60 @@
+
 #include "header.h"
-#include <conio.h>
-#include <consoleapi2.h>
-#include <processenv.h>
-#include <WinBase.h>
-#include <winnt.h>
-#include <algorithm>
-#include <cctype>
-#include <cstdlib>
-#include <iosfwd>
-#include <iostream>
-#include <list>
-#include <memory>
-#include <ostream>
-#include <string>
 
 // Function to create a new airport node
 Airport* createAirport(string codeIATA) {
+	// Allocate memory for a new Airport object on the heap
 	Airport* newAirport = new Airport;
+
+	// Assign the IATA code to the new airport
 	newAirport->codeIATA = codeIATA;
+
+	// Initialize the airlines list to nullptr (no airlines initially)
 	newAirport->airlines = nullptr;
+
+	// Initialize the next pointer to nullptr (end of the list)
 	newAirport->next = nullptr;
+
+	// Return the pointer to the newly created airport
 	return newAirport;
 }
 
 // Function to create a new airline node
 Airline* createAirline(string name) {
+	// Allocate memory for a new Airline object on the heap
 	Airline* newAirline = new Airline;
+
+	// Assign the airline name to the new node
 	newAirline->name = name;
+
+	// Initialize the next pointer to nullptr (end of the list)
 	newAirline->next = nullptr;
+
+	// Return the pointer to the newly created airline node
 	return newAirline;
 }
 
 // Function to add an airport to the end of the list
 void addAirport(Airport*& head, string codeIATA) {
+	// Create a new airport node using the given IATA code
 	Airport* newAirport = createAirport(codeIATA);
+
+	// Case 1: The list is empty (head is nullptr)
 	if (head == nullptr) {
+		// The new airport becomes the head of the list
 		head = newAirport;
 	}
+	// Case 2: The list is not empty
 	else {
+		// Start from the head of the list
 		Airport* current = head;
+
+		// Traverse the list until the last node (current->next is nullptr)
 		while (current->next != nullptr) {
 			current = current->next;
 		}
+
+		// Add the new airport to the end of the list
 		current->next = newAirport;
 	}
 }
@@ -61,11 +74,17 @@ void addAirline(Airport* airport, string name) {
 		}
 		current = current->next;
 	}
+
+	// Create a new airline node
 	Airline* newAirline = createAirline(name);
+
+	// Add the new airline to the airport's list
 	if (airport->airlines == nullptr) {
+		// If the airlines list is empty, set the new airline as the head
 		airport->airlines = newAirline;
 	}
 	else {
+		// If the list is not empty, find the last node and append the new airline
 		Airline* current = airport->airlines;
 		while (current->next != nullptr) {
 			current = current->next;
@@ -74,20 +93,31 @@ void addAirline(Airport* airport, string name) {
 	}
 }
 
+// Function to delete an airline from an airport
 void deleteAirlineFromAirport(Airport* head) {
+	// Main loop for deleting airlines
 	while (true) {
-		//cout << "List of existing airports:" << endl;
+		// Print the list of airports
 		printAirports(head);
 
+		// Get the IATA code of the airport
 		string codeIATA = getValidIATACode();
+
+		// Exit the loop if the user enters "~"
 		if (codeIATA == "~") break;
 
+		// Find the airport with the specified IATA code
 		Airport* airport = findAirportByCode(head, codeIATA);
+
+		// Check if the airport exists
 		if (airport != nullptr) {
+			// Get the name of the airline to delete
 			string airlineName = getValidAirlineName();
+
+			// Exit the loop if the user enters "~"
 			if (airlineName == "~") break;
 
-			// Check for multiple occurrences of the airline
+			// Check for multiple occurrences of the airline in the airport's list
 			int count = 0;
 			Airline* current = airport->airlines;
 			while (current != nullptr) {
@@ -97,10 +127,12 @@ void deleteAirlineFromAirport(Airport* head) {
 				current = current->next;
 			}
 
+			// If multiple occurrences are found, ask the user whether to delete all or a specific one
 			if (count > 1) {
 				cout << "Airline '" << airlineName << "' appears multiple times. "
 					<< "Do you want to delete all occurrences [Y] or a specific one [N]?\n>>";
 
+				// Delete all occurrences if the user chooses 'y'
 				if (getYesNoAnswer() == 'y') {
 					current = airport->airlines;
 					Airline* prev = nullptr;
@@ -121,10 +153,12 @@ void deleteAirlineFromAirport(Airport* head) {
 							current = current->next;
 						}
 					}
+					// Print a success message
 					setColor(2);
 					cout << "All occurrences of airline '" << airlineName << "' deleted from airport '" << codeIATA << "'.\n";
 					resetColor();
 				}
+				// Delete a specific occurrence if the user chooses 'n'
 				else {
 					deleteAirline(airport, airlineName);
 					setColor(2);
@@ -132,13 +166,16 @@ void deleteAirlineFromAirport(Airport* head) {
 					resetColor();
 				}
 			}
+			// If only one occurrence is found, delete it directly
 			else {
 				deleteAirline(airport, airlineName);
+				// Print a success message
 				setColor(2);
 				cout << "Airline '" << airlineName << "' deleted from airport '" << codeIATA << "'.\n";
 				resetColor();
 			}
 		}
+		// If the airport is not found, print an error message
 		else {
 			setColor(12);
 			cerr << "ERROR: Airport with this IATA code not found.\n";
@@ -149,63 +186,85 @@ void deleteAirlineFromAirport(Airport* head) {
 
 // Function to delete an airport by IATA code
 void deleteAirport(Airport*& head, string codeIATA) {
+	// If the airport list is empty, return
 	if (head == nullptr) return;
 
 	// Case 1: Deleting the head node
 	if (head->codeIATA == codeIATA) {
+		// Store the head node in a temporary variable
 		Airport* temp = head;
+		// Update the head pointer to the next node
 		head = head->next;
 
+		// Delete all airlines associated with the airport
 		Airline* currentAirline = temp->airlines;
 		while (currentAirline != nullptr) {
 			Airline* tempAirline = currentAirline;
 			currentAirline = currentAirline->next;
 			delete tempAirline;
 		}
+
+		// Delete the airport node
 		delete temp;
+		// Print a success message
 		setColor(2);
 		cout << "Airport '" << codeIATA << "' deleted successfully.\n";
 		resetColor();
+		// Return from the function
 		return;
 	}
 
 	// Case 2: Deleting a node other than the head
+	// Start from the node after the head
 	Airport* current = head->next;
+	// Keep track of the previous node
 	Airport* prev = head;
 
+	// Traverse the list until the airport with the matching IATA code is found
 	while (current != nullptr && current->codeIATA != codeIATA) {
 		prev = current;
 		current = current->next;
 	}
 
+	// If the airport is found
 	if (current != nullptr) {
+		// Check if the airport has any airlines associated with it
 		if (current->airlines != nullptr) {
+			// Ask the user for confirmation before deleting
 			cout << "Airport '" << codeIATA << "' has airlines associated with it.\n"
 				<< "Are you sure you want to delete it? (y/n): ";
 			if (getYesNoAnswer() != 'y') {
+				// If the user does not confirm, return from the function
 				return;
 			}
 		}
 
+		// Bypass the current node (delete the airport from the list)
 		prev->next = current->next;
 
+		// Delete all airlines associated with the airport
 		Airline* currentAirline = current->airlines;
 		while (currentAirline != nullptr) {
 			Airline* tempAirline = currentAirline;
 			currentAirline = currentAirline->next;
 			delete tempAirline;
 		}
+
+		// Delete the airport node
 		delete current;
+		// Print a success message
 		setColor(2);
 		cout << "Airport '" << codeIATA << "' deleted successfully.\n";
 		resetColor();
 	}
+	// If the airport is not found, print an error message
 	else {
 		setColor(12);
 		cerr << "ERROR: Airport '" << codeIATA << "' not found.\n";
 		resetColor();
 	}
 }
+
 // Function to delete an airline from an airport by name
 void deleteAirportFromList(Airport*& head, bool& dataModified) {
 	//cout << "List of existing airports:" << endl;
@@ -224,34 +283,52 @@ void deleteAirportFromList(Airport*& head, bool& dataModified) {
 
 // Function to delete an airline from an airport
 bool deleteAirline(Airport* airport, string name) {
+	// If the airport has no airlines, return false (airline not found)
 	if (airport->airlines == nullptr) return false;
 
+	// Check if the first airline in the list matches the name
 	if (airport->airlines->name == name) {
+		// Store the first airline node in a temporary variable
 		Airline* temp = airport->airlines;
+		// Update the head of the airlines list to the next airline
 		airport->airlines = airport->airlines->next;
+		// Delete the temporary airline node
 		delete temp;
+		// Return true (airline deleted)
 		return true;
 	}
 
+	// Initialize pointers for traversing the list
 	Airline* current = airport->airlines;
-	Airline* prev = nullptr; // Initialize prev here
+	Airline* prev = nullptr;
 
+	// Traverse the list until the airline with the matching name is found
 	while (current != nullptr && current->name != name) {
-		prev = current;     // Update prev only after you've moved to the next node
+		// Update the previous pointer to the current node
+		prev = current;
+		// Move to the next airline in the list
 		current = current->next;
 	}
 
+	// If the airline is found (current is not nullptr)
 	if (current != nullptr) {
-		if (prev != nullptr) { // Check if prev is valid
+		// If a previous node exists (not deleting the first airline)
+		if (prev != nullptr) {
+			// Bypass the current node, removing it from the list
 			prev->next = current->next;
 		}
+		// Delete the current airline node
 		delete current;
+		return true; // Airline deleted
 	}
+
+	// If the airline is not found, return false
 	return false;
 }
 
 // Function to print the list of airports and airlines
 void printAirports(Airport* head) {
+	// If the airport list is empty, print an error message and return
 	if (head == nullptr) {
 		setColor(12);
 		cerr << "ERROR: The list of airports is empty.\n";
@@ -259,29 +336,38 @@ void printAirports(Airport* head) {
 		return; // Nothing to print
 	}
 
+	// Print a header for the list of airports
 	cout << "List of airports:" << endl;
+
+	// Start from the head of the airport list
 	Airport* currentAirport = head;
+
+	// Iterate through each airport in the list
 	while (currentAirport != nullptr) {
-		//cout << "IATA Code: " << currentAirport->codeIATA << endl;
+		// Print the IATA code of the current airport
 		cout << currentAirport->codeIATA << endl;
+
+		// Get the list of airlines for the current airport
 		Airline* currentAirline = currentAirport->airlines;
+
+		// If the airport has airlines associated with it
 		if (currentAirline != nullptr) {
-			//cout << "  Airlines:" << endl;
+			// Iterate through each airline in the list
 			while (currentAirline != nullptr) {
-				//setColor(2);
+				// Set the text color to light blue
 				setColor(11);
+				// Print the airline name
 				cout << "  " << currentAirline->name << endl;
-				//cout << "\t" << currentAirline->name << endl;
+				// Move to the next airline in the list
 				currentAirline = currentAirline->next;
+				// Reset the text color to the default
 				resetColor();
 			}
 		}
+		// Move to the next airport in the list
 		currentAirport = currentAirport->next;
 	}
 }
-
-
-
 // Function to load data from a file
 bool loadAirportsFromFile(Airport*& head, string filename) {
 	add_txt(filename); // Add .txt extension if needed
@@ -338,55 +424,82 @@ bool loadAirportsFromFile(Airport*& head, string filename) {
 
 // Function to save data to a file
 void saveAirportsToFile(Airport* head, string filename) {
-	add_txt(filename); // Add .txt extension if needed
+	// Ensure the filename has a .txt extension
+	add_txt(filename);
 
-	// Check if the list is empty
+	// Check if the airport list is empty
 	if (head == nullptr) {
+		// If empty, display an error message and return
 		setColor(12);
 		cerr << "ERROR: The list of airports is empty. Nothing to save.\n";
 		resetColor();
 		return;
 	}
 
+	// Open the output file for writing
 	ofstream outFile(filename);
+
+	// Check if the file was opened successfully
 	if (!outFile.is_open()) {
+		// If not, display an error message and return
 		setColor(12);
-		cerr << "ERROR: Unable to open the file '" << filename << "' for writing." << endl;
+		cerr << "ERROR: Unable to open the file '" << filename << "' for writing.\n";
 		resetColor();
 		return;
 	}
 
+	// Start from the head of the airport list
 	Airport* currentAirport = head;
+
+	// Iterate through each airport in the list
 	while (currentAirport != nullptr) {
+		// Get the list of airlines for the current airport
 		Airline* currentAirline = currentAirport->airlines;
+
+		// Iterate through each airline for the current airport
 		while (currentAirline != nullptr) {
+			// Write the airline name and airport IATA code to the file
 			outFile << currentAirline->name << "\t" << currentAirport->codeIATA << endl;
+			// Move to the next airline in the list
 			currentAirline = currentAirline->next;
 		}
+		// Move to the next airport in the list
 		currentAirport = currentAirport->next;
 	}
+
+	// Close the output file
 	outFile.close();
+
+	// Display a success message to the user
 	setColor(2);
-	cout << "List of airports successfully saved to file '" << filename << "'" << endl;
+	cout << "List of airports successfully saved to file '" << filename << "'\n";
 	resetColor();
 }
 
 // Function to find an airport by IATA code
 Airport* findAirportByCode(Airport* head, string codeIATA) {
+	// Start from the head of the airport list
 	Airport* current = head;
+
+	// Iterate through the list until the end is reached
 	while (current != nullptr) {
+		// If the current airport's IATA code matches the search code
 		if (current->codeIATA == codeIATA) {
+			// Return a pointer to the found airport
 			return current;
 		}
+		// Move to the next airport in the list
 		current = current->next;
 	}
+
+	// If the IATA code is not found, return nullptr
 	return nullptr;
 }
 
 // Function to display the menu and get user's choice
 int menuSelection() {
 	while (true) {
-		cout<< "1. Add airport to the end of the list\n"
+		cout << "1. Add airport to the end of the list\n"
 			<< "2. Add an airline to an airport\n"
 			<< "3. Delete an airport from the list\n"
 			<< "4. Delete an airline from an airport\n"
@@ -451,8 +564,7 @@ string getValidIATACode() {
 		codeIATA.erase(remove(codeIATA.begin(), codeIATA.end(), ' '), codeIATA.end());
 
 		// IATA code validation (3 uppercase letters)
-		if (codeIATA.length() == 3 &&
-			all_of(codeIATA.begin(), codeIATA.end(), ::isupper)) {
+		if (codeIATA.length() == 3 && all_of(codeIATA.begin(), codeIATA.end(), ::isupper)) {
 			return codeIATA; // Valid IATA code
 		}
 		else {

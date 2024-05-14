@@ -1,7 +1,10 @@
 #pragma once
+#include <string>
+#include <algorithm>
 #include <conio.h>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <string>
 #include <windows.h>
 #include <list>
