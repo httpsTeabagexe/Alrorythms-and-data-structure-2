@@ -140,7 +140,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="airports.txt" />
+    <Text Include="ap.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Alrorythms and data structure 2.rc" />

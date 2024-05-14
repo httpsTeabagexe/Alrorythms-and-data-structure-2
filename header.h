@@ -33,7 +33,8 @@ void addAirport(Airport*& head, string codeIATA);
 // Функция для добавления авиакомпании к аэропорту
 void addAirline(Airport* airport, string name);
 
-void deleteAirlineFromAirport(Airport*& head, bool& dataModified);
+// Функция для удаления авиакомпании из аэропорта
+void deleteAirlineFromAirport(Airport* head);
 
 // Функция для удаления аэропорта из списка
 void deleteAirportFromList(Airport*& head, bool& dataModified);
@@ -42,7 +43,7 @@ void deleteAirportFromList(Airport*& head, bool& dataModified);
 void deleteAirport(Airport*& head, string codeIATA);
 
 // Функция для удаления авиакомпании из аэропорта
-void deleteAirline(Airport* airport, string name);
+bool deleteAirline(Airport* airport, string name);
 
 // Функция для вывода списка аэропортов и авиакомпаний
 void printAirports(Airport* head);

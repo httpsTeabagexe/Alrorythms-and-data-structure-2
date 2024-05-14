@@ -74,72 +74,77 @@ void addAirline(Airport* airport, string name) {
 	}
 }
 
-void deleteAirlineFromAirport(Airport*& head, bool& dataModified) {
-	cout << "List of existing airports:" << endl;
-	printAirports(head);
+void deleteAirlineFromAirport(Airport* head) {
+	while (true) {
+		//cout << "List of existing airports:" << endl;
+		printAirports(head);
 
-	string codeIATA;
-	codeIATA = getValidIATACode();
-	if (codeIATA == "~") return;
+		string codeIATA = getValidIATACode();
+		if (codeIATA == "~") break;
 
-	Airport* airport = findAirportByCode(head, codeIATA);
-	if (airport != nullptr) {
-		string airlineName = getValidAirlineName();
-		if (airlineName == "~") return;
+		Airport* airport = findAirportByCode(head, codeIATA);
+		if (airport != nullptr) {
+			string airlineName = getValidAirlineName();
+			if (airlineName == "~") break;
 
-		// Check for multiple occurrences of the airline
-		int count = 0;
-		Airline* current = airport->airlines;
-		while (current != nullptr) {
-			if (current->name == airlineName) {
-				count++;
+			// Check for multiple occurrences of the airline
+			int count = 0;
+			Airline* current = airport->airlines;
+			while (current != nullptr) {
+				if (current->name == airlineName) {
+					count++;
+				}
+				current = current->next;
 			}
-			current = current->next;
-		}
 
-		if (count > 1) { // Multiple occurrences found
-			cout << "Airline '" << airlineName << "' appears multiple times. " << "Do you want to delete all occurrences [Y] or a specific one [N]?\n>>";
+			if (count > 1) {
+				cout << "Airline '" << airlineName << "' appears multiple times. "
+					<< "Do you want to delete all occurrences [Y] or a specific one [N]?\n>>";
 
-			if (getYesNoAnswer() == 'y') {
-				// Delete all occurrences
-				current = airport->airlines;
-				Airline* prev = nullptr;
-				while (current != nullptr) {
-					if (current->name == airlineName) {
-						if (prev == nullptr) {
-							airport->airlines = current->next; // Update head of airline list
+				if (getYesNoAnswer() == 'y') {
+					current = airport->airlines;
+					Airline* prev = nullptr;
+					while (current != nullptr) {
+						if (current->name == airlineName) {
+							if (prev == nullptr) {
+								airport->airlines = current->next;
+							}
+							else {
+								prev->next = current->next;
+							}
+							Airline* temp = current;
+							current = current->next;
+							delete temp;
 						}
 						else {
-							prev->next = current->next;
+							prev = current;
+							current = current->next;
 						}
-						Airline* temp = current;
-						current = current->next;
-						delete temp;
 					}
-					else {
-						prev = current;
-						current = current->next;
-					}
+					setColor(2);
+					cout << "All occurrences of airline '" << airlineName << "' deleted from airport '" << codeIATA << "'.\n";
+					resetColor();
+				}
+				else {
+					deleteAirline(airport, airlineName);
+					setColor(2);
+					cout << "One occurrence of airline '" << airlineName << "' deleted from airport '" << codeIATA << "'.\n";
+					resetColor();
 				}
 			}
 			else {
-				// Delete a specific occurrence - this part stays the same
 				deleteAirline(airport, airlineName);
+				setColor(2);
+				cout << "Airline '" << airlineName << "' deleted from airport '" << codeIATA << "'.\n";
+				resetColor();
 			}
 		}
 		else {
-			// Delete the single occurrence
-			deleteAirline(airport, airlineName);
+			setColor(12);
+			cerr << "ERROR: Airport with this IATA code not found.\n";
+			resetColor();
 		}
-
-		dataModified = true;
 	}
-	else {
-		setColor(12);
-		cerr << "ERROR: Airport with this IATA code not found.\n";
-		resetColor();
-	}
-
 }
 
 // Function to delete an airport by IATA code
@@ -149,41 +154,41 @@ void deleteAirport(Airport*& head, string codeIATA) {
 	// Case 1: Deleting the head node
 	if (head->codeIATA == codeIATA) {
 		Airport* temp = head;
-		head = head->next; // Update head to the next node
+		head = head->next;
 
-		// Delete all airlines associated with this airport
 		Airline* currentAirline = temp->airlines;
 		while (currentAirline != nullptr) {
 			Airline* tempAirline = currentAirline;
 			currentAirline = currentAirline->next;
 			delete tempAirline;
 		}
-		delete temp; // Delete the airport
+		delete temp;
+		setColor(2);
+		cout << "Airport '" << codeIATA << "' deleted successfully.\n";
+		resetColor();
 		return;
 	}
 
 	// Case 2: Deleting a node other than the head
-	Airport* current = head->next; // Start from the node after head
-	Airport* prev = head;         // Keep track of the previous node
+	Airport* current = head->next;
+	Airport* prev = head;
 
 	while (current != nullptr && current->codeIATA != codeIATA) {
 		prev = current;
 		current = current->next;
 	}
 
-	if (current != nullptr) { // Found the airport to delete
-		// Check if the airport has any airlines associated with it
+	if (current != nullptr) {
 		if (current->airlines != nullptr) {
-			cout << "Airport '" << codeIATA << "' has airlines associated with it.\n" << "Are you sure you want to delete it? (y/n): ";
+			cout << "Airport '" << codeIATA << "' has airlines associated with it.\n"
+				<< "Are you sure you want to delete it? (y/n): ";
 			if (getYesNoAnswer() != 'y') {
-				return; // User chose not to delete
+				return;
 			}
 		}
 
-		// Proceed with deletion
-		prev->next = current->next; // Bypass the current node
+		prev->next = current->next;
 
-		// Delete all airlines associated with this airport
 		Airline* currentAirline = current->airlines;
 		while (currentAirline != nullptr) {
 			Airline* tempAirline = currentAirline;
@@ -191,12 +196,19 @@ void deleteAirport(Airport*& head, string codeIATA) {
 			delete tempAirline;
 		}
 		delete current;
+		setColor(2);
+		cout << "Airport '" << codeIATA << "' deleted successfully.\n";
+		resetColor();
+	}
+	else {
+		setColor(12);
+		cerr << "ERROR: Airport '" << codeIATA << "' not found.\n";
+		resetColor();
 	}
 }
-
 // Function to delete an airline from an airport by name
 void deleteAirportFromList(Airport*& head, bool& dataModified) {
-	cout << "List of existing airports:" << endl;
+	//cout << "List of existing airports:" << endl;
 	printAirports(head); // Show the list of airports
 
 	if (head == nullptr) {
@@ -211,14 +223,14 @@ void deleteAirportFromList(Airport*& head, bool& dataModified) {
 }
 
 // Function to delete an airline from an airport
-void deleteAirline(Airport* airport, string name) {
-	if (airport->airlines == nullptr) return;
+bool deleteAirline(Airport* airport, string name) {
+	if (airport->airlines == nullptr) return false;
 
 	if (airport->airlines->name == name) {
 		Airline* temp = airport->airlines;
 		airport->airlines = airport->airlines->next;
 		delete temp;
-		return;
+		return true;
 	}
 
 	Airline* current = airport->airlines;
@@ -235,6 +247,7 @@ void deleteAirline(Airport* airport, string name) {
 		}
 		delete current;
 	}
+	return false;
 }
 
 // Function to print the list of airports and airlines
@@ -249,13 +262,16 @@ void printAirports(Airport* head) {
 	cout << "List of airports:" << endl;
 	Airport* currentAirport = head;
 	while (currentAirport != nullptr) {
-		cout << "IATA Code: " << currentAirport->codeIATA << endl;
+		//cout << "IATA Code: " << currentAirport->codeIATA << endl;
+		cout << currentAirport->codeIATA << endl;
 		Airline* currentAirline = currentAirport->airlines;
 		if (currentAirline != nullptr) {
-			cout << "  Airlines:" << endl;
+			//cout << "  Airlines:" << endl;
 			while (currentAirline != nullptr) {
-				setColor(2);
-				cout << "\t" << currentAirline->name << endl;
+				//setColor(2);
+				setColor(11);
+				cout << "  " << currentAirline->name << endl;
+				//cout << "\t" << currentAirline->name << endl;
 				currentAirline = currentAirline->next;
 				resetColor();
 			}
@@ -263,6 +279,8 @@ void printAirports(Airport* head) {
 		currentAirport = currentAirport->next;
 	}
 }
+
+
 
 // Function to load data from a file
 bool loadAirportsFromFile(Airport*& head, string filename) {
@@ -277,7 +295,8 @@ bool loadAirportsFromFile(Airport*& head, string filename) {
 	// Check if the data structure is already populated
 	if (head != nullptr) {
 		cout << "The data structure is not empty. "
-			<< "Do you want to [Y] - merge data from the file or [N] - save existing data to a different file?\n" << "After saving data to different file, the data will be merged with data from file";
+			<< "Do you want to [Y] - merge data from the file or [N] - save existing data to a different file?\n"
+			<< "After saving data to different file, the data will be merged with data from file\n>>";
 		char choice = getYesNoAnswer();
 
 		if (choice == 'n') {
@@ -374,7 +393,8 @@ int menuSelection() {
 		}
 		else {
 			setColor(12);
-			cerr << "\nInvalid choice. Please enter a number between 0 and 7.\n";
+			system("cls");
+			cerr << "Invalid choice. Please enter a number between 0 and 7.\n";
 			resetColor();
 		}
 	}

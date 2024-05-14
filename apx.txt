@@ -1,0 +1,26 @@
+ISTALINE	DME
+Red Wings Airlines	DME
+Yamal Airlines	DME
+S7 Airlines	DME
+TRANSAERO	DME
+ISTALINE	DME
+Red Wings Airlines	DME
+Yamal Airlines	DME
+S7 Airlines	DME
+Azur Air	VKO
+UTair	VKO
+KARAT	VKO
+Pobeda	VKO
+Azur Air	VKO
+UTair	VKO
+KARAT	VKO
+Aeroflot	SVO
+Nordwind Airlines	SVO
+Aeroflot	SVO
+Royal Flight	VVO
+Angara Airlines	IKT
+Alrosa	IKT
+Angara Airlines	IKT
+IrAero	IRK
+RusLine	KZN
+UVT Aero	UFA

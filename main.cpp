@@ -12,6 +12,19 @@ int main() {
 	//удаление нескольких авиакомпаний за один раз
 	//сортировка аэропортов
 	//поиск по имени авиалинии в каком аэропорту она содержится
+
+	//спрашивать пользователя о сохранении данных в уже существующий файл, и запретить запись пустой структуры в файл
+
+	//добавить возможность удалить все дубликаты в одном аэропорте
+
+	//loadAirportsFromFile после мерджа данных модификатор "модифайд" поменять на тру и спрашивать юзера схоранить ли данные
+
+	//сортировка внутри выходных файлов???
+
+	//сообщение когда ничего не удалено в удалении авиалиний
+
+	//удаление пока не будет введен спецсимвол ~ в 3 и 4 пункте меню
+
 	setlocale(LC_ALL, "RUSSIAN");
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
@@ -71,18 +84,35 @@ int main() {
 			break;
 		}
 		case 3: { // Delete airport
-			deleteAirportFromList(head, dataModified);
+			while (true) {
+				cout << "List of existing airports:" << endl;
+				printAirports(head); // Show the list of airports
+
+				if (head == nullptr) {
+					continue; // Go back to main menu if the list is empty
+				}
+
+				string codeIATA = getValidIATACode();
+				if (codeIATA == "~") break; // Return to main menu
+
+				deleteAirport(head, codeIATA);
+				dataModified = true;
+			}
 			break;
 		}
-		case 4: { // Delete airline
-			deleteAirlineFromAirport(head, dataModified);
+		case 4: {
+			deleteAirlineFromAirport(head);
+			dataModified = true;
 			break;
 		}
 		case 5: // Print airports
+			system("cls");
 			printAirports(head);
+			system("pause");
 			break; // dataModified doesn't need to be changed here
 
 		case 6: { // Load from file
+			system("cls");
 			cout << "List of .txt files in current folder" << endl;
 			setColor(2);
 			system("dir /b *.txt");
@@ -90,8 +120,12 @@ int main() {
 			filename = getFilename();
 			if (filename == "~") continue;
 			if (loadAirportsFromFile(head, filename)) {
-				dataModified = false;
+				// Check if merging happened (head was not nullptr before loading)
+				if (head != nullptr) {
+					dataModified = true; // Set dataModified to true only after merging
+				}
 			}
+			system("pause");
 			break;
 		}
 		case 7: { // Save to file
