@@ -11,13 +11,12 @@ int main() {
 	////сообщение когда ничего не удалено в удалении авиалиний
 	////удаление пока не будет введен спецсимвол ~ в 3 и 4 пункте меню
 
-	//спрашивать пользователя о сохранении данных в уже существующий файл, и 
+	//спрашивать пользователя о сохранении данных в уже существующий файл, и
 	//сортировка внутри выходных файлов???
 	//поиск по имени авиалинии в каком аэропорту она содержится
 	//сортировка аэропортов
 
 	//!!ФИКС не загружаются данные в структуру из файла, а именно авиакомпании
-
 
 	setlocale(LC_ALL, "RUSSIAN");
 	SetConsoleCP(1251);
@@ -97,7 +96,7 @@ int main() {
 		}		
 		case 3: { // Delete airport
 			while (true) {
-				cout << "List of existing airports:" << endl;
+				//cout << "List of existing airports:" << endl;
 				printAirports(head); // Show the list of airports
 
 				// Check if the list is empty BEFORE asking for IATA code
