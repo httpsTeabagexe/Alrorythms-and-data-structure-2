@@ -1,10 +1,5 @@
 #include "header.h"
-#include <consoleapi2.h>
-#include <clocale>
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <string>
+
 int main() {
 	////todo дублирование в авиакомпаниях
 	////показывать данные при вводе в аэропорт
@@ -40,6 +35,13 @@ int main() {
 			while (true) {
 				string codeIATA = getValidIATACode();
 				if (codeIATA == "~") break; // Return to main menu
+
+				// --- Confirmation Before Adding ---
+				cout << "You entered IATA code: " << codeIATA << ". Add this airport? (y/n): ";
+				if (getYesNoAnswer() != 'y') {
+					continue; // Skip adding and ask for another IATA code
+				}
+
 				// Check for duplicate IATA code
 				if (findAirportByCode(head, codeIATA) != nullptr) {
 					setColor(12);
@@ -47,15 +49,23 @@ int main() {
 					resetColor();
 					continue; // Ask for another IATA code
 				}
+
 				addAirport(head, codeIATA);
 				dataModified = true;
+				// --- Confirmation After Adding ---
+				setColor(2); // Set color to green for success message
+				cout << "Airport '" << codeIATA << "' added successfully.\n";
+				resetColor();
 			}
 			break;
 		}
-
 		case 2: { // Add airline
-			cout << "List of existing airports:" << endl;
-			printAirports(head);
+			printAirports(head); // Print the list of airports
+
+			// --- Check if Airport List is Empty ---
+			if (head == nullptr) {
+				break; // Return to the main menu
+			}
 
 			while (true) { // Loop for entering IATA code
 				string codeIATA = getValidIATACode();
@@ -70,6 +80,10 @@ int main() {
 
 						addAirline(airport, airlineName);
 						dataModified = true;
+
+						setColor(2);
+						cout << "Airline '" << airlineName << "' added to airport '" << codeIATA << "' successfully.\n";
+						resetColor();
 					}
 					break; // Exit the IATA code loop
 				}
@@ -77,18 +91,18 @@ int main() {
 					setColor(12);
 					cerr << "ERROR: Airport with this IATA code not found.\n";
 					resetColor();
-					// The loop will continue to ask for a valid IATA code
 				}
 			}
 			break;
-		}
+		}		
 		case 3: { // Delete airport
 			while (true) {
 				cout << "List of existing airports:" << endl;
 				printAirports(head); // Show the list of airports
 
+				// Check if the list is empty BEFORE asking for IATA code
 				if (head == nullptr) {
-					continue; // Go back to main menu if the list is empty
+					break; // Return to main menu if the list is empty
 				}
 
 				string codeIATA = getValidIATACode();
@@ -99,7 +113,7 @@ int main() {
 			}
 			break;
 		}
-		case 4: {
+		case 4: { // Delete airline
 			deleteAirlineFromAirport(head);
 			dataModified = true;
 			break;

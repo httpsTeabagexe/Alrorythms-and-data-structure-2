@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <list>
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 // Структура для хранения информации об авиакомпании
@@ -38,6 +39,9 @@ void addAirline(Airport* airport, string name);
 
 // Функция для удаления авиакомпании из аэропорта
 void deleteAirlineFromAirport(Airport* head);
+
+// Функция для удаления авиакомпании по индексу
+void deleteAirlineByIndex(Airport* airport, string& name, int index);
 
 // Функция для удаления аэропорта из списка
 void deleteAirportFromList(Airport*& head, bool& dataModified);

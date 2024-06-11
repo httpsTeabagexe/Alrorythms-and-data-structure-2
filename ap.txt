@@ -4,16 +4,12 @@ UVT Aero	UFA
 Royal Flight	VVO
 Ural Airlines	SVX
 SAMARA	KUF
-TRANSAERO	DME
-Pobeda	VKO
-Azur Air	VKO
-Nordwind Airlines	SVO
 ISTALINE	DME
 Red Wings Airlines	DME
 Alrosa	IKT
 Angara Airlines	IKT
 UTair	VKO
-Yamal Airlines	DME
 KARAT	VKO
+Pobeda	VKO
 Aeroflot	SVO
 S7 Airlines	DME
