@@ -117,11 +117,13 @@ int main() {
 			dataModified = true;
 			break;
 		}
-		case 5: // Print airports
+		case 5: { // Print airports
 			system("cls");
+			sortAirports(head); // Sort the airports alphabetically
 			printAirports(head);
 			system("pause");
 			break; // dataModified doesn't need to be changed here
+		}
 
 		case 6: { // Load from file
 			system("cls");
@@ -151,6 +153,25 @@ int main() {
 			dataModified = false;
 			break;
 		}
+		case 8: { // Search for airline
+			if (head == nullptr) {
+				setColor(12);
+				cout << "The list of airports and airlines is empty.\n";
+				resetColor();
+				system("pause");
+			}
+			else {
+				while (true) {
+					string airlineName = getValidAirlineName();
+					if (airlineName == "~") break; // Return to main menu
+
+					searchAirlineInAirports(head, airlineName);
+					system("pause");
+				}
+			}
+			break;
+		}
+
 		case 0: { // Exit
 			if (dataModified) {
 				cout << "Data has been modified. Do you want to save changes to a file? (y/n): ";

@@ -441,6 +441,76 @@ bool loadAirportsFromFile(Airport*& head, string filename) {
 	return true;
 }
 
+void searchAirlineInAirports(Airport* head, string airlineName) {
+	if (head == nullptr) {
+		setColor(12);
+		cout << "The list of airports and airlines is empty.\n";
+		resetColor();
+		return;
+	}
+
+	bool found = false;
+	Airport* currentAirport = head;
+
+	cout << "Searching for airline '" << airlineName << "'...\n";
+	cout << "----------------------------------------\n";
+
+	while (currentAirport != nullptr) {
+		Airline* currentAirline = currentAirport->airlines;
+		int count = 0;
+
+		while (currentAirline != nullptr) {
+			if (currentAirline->name == airlineName) {
+				count++;
+			}
+			currentAirline = currentAirline->next;
+		}
+
+		if (count > 0) {
+			cout << "Airport: " << currentAirport->codeIATA << "\n";
+			cout << "  Airline '" << airlineName << "' found " << count << " time(s).\n";
+			cout << "----------------------------------------\n";
+			found = true;
+		}
+
+		currentAirport = currentAirport->next;
+	}
+
+	if (!found) {
+		setColor(12);
+		cout << "Airline '" << airlineName << "' not found in any airport.\n";
+		resetColor();
+	}
+}
+
+
+
+
+// Function to sort airports alphabetically by IATA code
+void sortAirports(Airport*& head) {
+	if (head == nullptr) return;
+
+	bool swapped;
+	Airport* ptr1;
+	Airport* lptr = nullptr;
+
+	do {
+		swapped = false;
+		ptr1 = head;
+
+		while (ptr1->next != lptr) {
+			if (ptr1->codeIATA > ptr1->next->codeIATA) {
+				// Swap the data
+				swap(ptr1->codeIATA, ptr1->next->codeIATA);
+				swap(ptr1->airlines, ptr1->next->airlines);
+				swapped = true;
+			}
+			ptr1 = ptr1->next;
+		}
+		lptr = ptr1;
+	} while (swapped);
+}
+
 // Function to save data to a file
 void saveAirportsToFile(Airport* head, string filename) {
 	// Ensure the filename has a .txt extension
@@ -522,9 +592,10 @@ int menuSelection() {
 			<< "2. Add an airline to an airport\n"
 			<< "3. Delete an airport from the list\n"
 			<< "4. Delete an airline from an airport\n"
-			<< "5. Display the list of airports\n"
+			<< "5. Display the list of airports (sorted alphabetically)\n"
 			<< "6. Load data from a file\n"
 			<< "7. Save data to a file\n"
+			<< "8. Search for airline\n"
 			<< "0. Exit\n";
 
 		int choice = _getch() - '0'; // Directly convert char to int

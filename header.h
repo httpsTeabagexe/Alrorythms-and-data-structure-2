@@ -58,6 +58,12 @@ void printAirports(Airport* head);
 // Функция для загрузки данных из файла
 bool loadAirportsFromFile(Airport*& head, string filename);
 
+// Функция для поиска авиакомпании в аэропортах
+void searchAirlineInAirports(Airport* head, string airlineName);
+
+// Функция для сортировки списка аэропортов по коду IATA
+void sortAirports(Airport*& head);
+
 // Функция для сохранения данных в файл
 void saveAirportsToFile(Airport* head, string filename);
 
